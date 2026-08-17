@@ -16,18 +16,18 @@ import unsupervised_theme;
 
 real cellSize = 1;
 
-string[] rowLabels = {"Beer","Bread","Chips","Diapers","Eggs","Milk"};
+string[] rowLabels = {"Applesauce","Beer","Bread","Chips","Eggs","Milk"};
 string[] colLabels = {"$C_1$","$C_2$","$C_3$","$C_4$","$C_5$",
                        "$C_6$","$C_7$","$C_8$","$C_9$"};
 
 // purchased[row][col], in the row/column order above
 bool[][] purchased = {
-    {false, false, false, false, true,  true,  true,  true,  true },  // Beer
-    {true,  true,  false, true,  false, true,  false, true,  true },  // Bread
-    {false, false, false, false, true,  true,  true,  true,  true },  // Chips
-    {true,  true,  true,  false, false, false, false, false, false},  // Diapers
-    {true,  false, true,  true,  false, false, false, false, false},  // Eggs
-    {true,  true,  true,  true,  false, false, false, false, true }   // Milk
+    {false, false, false, false, false, true,  false, true,  true },  // Applesauce
+    {false, true,  true,  true,  true,  false, true,  false, false},  // Beer
+    {true,  false, true,  false, true,  false, true,  true,  true },  // Bread
+    {false, true,  true,  true,  true,  false, true,  false, false},  // Chips
+    {true,  false, false, false, false, true,  false, true,  false},  // Eggs
+    {true,  false, false, false, true,  true,  false, true,  true }   // Milk
 };
 
 pair cellCorner(int row, int col) {

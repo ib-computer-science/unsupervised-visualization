@@ -7,7 +7,7 @@
 // Derivation (support/confidence/lift over the 9 baskets -- computed
 // offline, not recomputed here):
 //   {Beer} -> {Chips}:        support=0.556 confidence=1.000 lift=1.800
-//   {Diapers} -> {Milk}:      support=0.333 confidence=1.000 lift=1.800
+//   {Applesauce} -> {Milk}:   support=0.333 confidence=1.000 lift=1.800
 //   {Bread,Milk} -> {Eggs}:   support=0.222 confidence=0.500 lift=1.500
 // The first two are perfect-confidence rules, one from each customer
 // segment found by the dendrogram (snacks/beer, family/staples); the third
@@ -25,7 +25,7 @@ void drawAssocRulesDiagram(picture pic, Theme theme) {
                   theme, 0.556, 1.000, 1.800);
     label(pic, "snacks/beer segment", (antX, 7 - 0.9), theme.text);
 
-    drawRule(pic, (antX, 4), new string[] {"Diapers"},
+    drawRule(pic, (antX, 4), new string[] {"Applesauce"},
                   (consX, 4), new string[] {"Milk"},
                   theme, 0.333, 1.000, 1.800);
     label(pic, "family/staples segment", (antX, 4 - 0.9), theme.text);

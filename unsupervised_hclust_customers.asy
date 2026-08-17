@@ -3,20 +3,24 @@
 // unsupervised_customer_data.asy, segmenting them by basket similarity.
 //
 // Derivation (Jaccard distance between baskets, UPGMA/average-linkage
-// clustering -- computed offline, not recomputed here):
+// clustering -- computed offline, not recomputed here). Recomputed after
+// Diapers was dropped from the catalog (see unsupervised_customer_data.asy)
+// -- removing an item changes basket sizes/intersections, so both the tree
+// shape and merge heights shifted slightly, though the final 2-segment
+// split is unchanged:
 //   Merge sequence (id: left + right, height = avg. Jaccard distance):
-//     N0: C5 + C7   height=0.000   (identical baskets: Beer, Chips)
-//     N1: C6 + C8   height=0.000   (identical baskets: Beer, Chips, Bread)
-//     N2: C1 + C2   height=0.250
-//     N3: C9 + N1   height=0.250
-//     N4: C3 + N2   height=0.375
+//     N0: C2 + C4   height=0.000   (identical baskets: Beer, Chips)
+//     N1: C3 + C7   height=0.000   (identical baskets: Beer, Bread, Chips)
+//     N2: C1 + C8   height=0.250
+//     N3: C5 + N1   height=0.250
+//     N4: C6 + N2   height=0.375
 //     N5: N0 + N3   height=0.389
-//     N6: C4 + N4   height=0.417
+//     N6: C9 + N4   height=0.417
 //     N7: N5 + N6   height=0.878   (root)
-//   Leaf order (left to right, no edge crossings): C5,C7,C9,C6,C8,C4,C3,C1,C2
+//   Leaf order (left to right, no edge crossings): C2,C4,C5,C3,C7,C9,C6,C1,C8
 //   Cutting at height 0.6 (between the last internal merge at 0.417 and the
-//   root at 0.878) yields exactly 2 segments: {C5,C7,C9,C6,C8} (snacks/beer
-//   buyers) and {C4,C3,C1,C2} (family/staples buyers).
+//   root at 0.878) yields exactly 2 segments: {C2,C4,C5,C3,C7} (snacks/beer
+//   buyers) and {C9,C6,C1,C8} (family/staples buyers).
 
 import unsupervised_theme;
 import unsupervised_dendrogram;
@@ -25,30 +29,30 @@ real yScale = 8;  // plot-units per unit of Jaccard distance
 
 void drawHclustDiagram(picture pic, Theme theme) {
     // --- Leaves, in clustering order, 1 plot-unit apart
-    pair posC5 = (0,0);
-    pair posC7 = (1,0);
-    pair posC9 = (2,0);
-    pair posC6 = (3,0);
-    pair posC8 = (4,0);
-    pair posC4 = (5,0);
-    pair posC3 = (6,0);
+    pair posC2 = (0,0);
+    pair posC4 = (1,0);
+    pair posC5 = (2,0);
+    pair posC3 = (3,0);
+    pair posC7 = (4,0);
+    pair posC9 = (5,0);
+    pair posC6 = (6,0);
     pair posC1 = (7,0);
-    pair posC2 = (8,0);
+    pair posC8 = (8,0);
 
-    string[] leafLabel = {"$C_5$","$C_7$","$C_9$","$C_6$","$C_8$",
-                           "$C_4$","$C_3$","$C_1$","$C_2$"};
-    pair[] leafPos = {posC5,posC7,posC9,posC6,posC8,posC4,posC3,posC1,posC2};
+    string[] leafLabel = {"$C_2$","$C_4$","$C_5$","$C_3$","$C_7$",
+                           "$C_9$","$C_6$","$C_1$","$C_8$"};
+    pair[] leafPos = {posC2,posC4,posC5,posC3,posC7,posC9,posC6,posC1,posC8};
     for (int i = 0; i < leafPos.length; ++i)
         drawDendroLeaf(pic, leafPos[i], leafLabel[i], theme);
 
     // --- Merges, in the order they occur (increasing height)
-    pair posN0 = drawDendroMerge(pic, posC5, posC7, 0.000*yScale, theme);
-    pair posN1 = drawDendroMerge(pic, posC6, posC8, 0.000*yScale, theme);
-    pair posN2 = drawDendroMerge(pic, posC1, posC2, 0.250*yScale, theme);
-    pair posN3 = drawDendroMerge(pic, posC9, posN1, 0.250*yScale, theme);
-    pair posN4 = drawDendroMerge(pic, posC3, posN2, 0.375*yScale, theme);
+    pair posN0 = drawDendroMerge(pic, posC2, posC4, 0.000*yScale, theme);
+    pair posN1 = drawDendroMerge(pic, posC3, posC7, 0.000*yScale, theme);
+    pair posN2 = drawDendroMerge(pic, posC1, posC8, 0.250*yScale, theme);
+    pair posN3 = drawDendroMerge(pic, posC5, posN1, 0.250*yScale, theme);
+    pair posN4 = drawDendroMerge(pic, posC6, posN2, 0.375*yScale, theme);
     pair posN5 = drawDendroMerge(pic, posN0, posN3, 0.389*yScale, theme);
-    pair posN6 = drawDendroMerge(pic, posC4, posN4, 0.417*yScale, theme);
+    pair posN6 = drawDendroMerge(pic, posC9, posN4, 0.417*yScale, theme);
     drawDendroMerge(pic, posN5, posN6, 0.878*yScale, theme);
 
     // --- Distance axis

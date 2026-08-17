@@ -8,28 +8,55 @@
 
 import unsupervised_theme;
 
-real itemBoxW = 1.6;
-real itemBoxH = 0.7;
-real itemGap  = 0.15;
+real itemBoxMinW = 1.6;
+real itemBoxH    = 0.7;
+real itemGap     = 0.15;
+real itemPadding = 0.3;  // horizontal text padding inside a box
 
-// A single item, drawn as a labeled box centered at pos.
+// Width of the label as it will actually typeset, so a box can be sized to
+// fit it -- item names vary in length (e.g. "Milk" vs "Applesauce"), and a
+// fixed box width either clips long names or wastes space on short ones.
+// label() measures into a frame using PostScript points (bp), while this
+// file's coordinates are in the picture's user units (cm, via renderTheme's
+// default unitsize) -- dividing by the `cm` constant (bp per cm) converts
+// the measurement into that same user-unit scale.
+real textWidth(string s, pen p) {
+    frame f;
+    label(f, s, (0,0), p);
+    return (max(f) - min(f)).x / cm;
+}
+
+real itemBoxWidth(string itemName, Theme theme) {
+    return max(itemBoxMinW, textWidth(itemName, theme.text) + itemPadding);
+}
+
+// A single item, drawn as a labeled box centered at pos, sized to fit its
+// label (see itemBoxWidth).
 void drawItemBox(picture pic, pair pos, string itemName, Theme theme) {
-    path b = box(pos - (itemBoxW/2, itemBoxH/2), pos + (itemBoxW/2, itemBoxH/2));
+    real w = itemBoxWidth(itemName, theme);
+    path b = box(pos - (w/2, itemBoxH/2), pos + (w/2, itemBoxH/2));
     filldraw(pic, b, theme.nodeFill, theme.stroke);
     label(pic, itemName, pos, theme.text);
 }
 
 // A horizontal row of item boxes (an antecedent or consequent itemset)
-// centered at centerPos. Returns {leftAnchor, rightAnchor} -- the
-// midpoints of the row's left and right edges -- so a rule arrow can attach
-// to whichever side faces the other itemset.
+// centered at centerPos, each box sized to fit its own label. Returns
+// {leftAnchor, rightAnchor} -- the midpoints of the row's left and right
+// edges -- so a rule arrow can attach to whichever side faces the other
+// itemset.
 pair[] drawItemset(picture pic, pair centerPos, string[] itemNames, Theme theme) {
     int n = itemNames.length;
-    real totalW = n*itemBoxW + (n-1)*itemGap;
-    real xStart = centerPos.x - totalW/2 + itemBoxW/2;
+    real[] widths = new real[n];
+    real totalW = -itemGap;
     for (int i = 0; i < n; ++i) {
-        pair pos = (xStart + i*(itemBoxW + itemGap), centerPos.y);
-        drawItemBox(pic, pos, itemNames[i], theme);
+        widths[i] = itemBoxWidth(itemNames[i], theme);
+        totalW += widths[i] + itemGap;
+    }
+    real x = centerPos.x - totalW/2;
+    for (int i = 0; i < n; ++i) {
+        real cx = x + widths[i]/2;
+        drawItemBox(pic, (cx, centerPos.y), itemNames[i], theme);
+        x += widths[i] + itemGap;
     }
     pair left = (centerPos.x - totalW/2, centerPos.y);
     pair right = (centerPos.x + totalW/2, centerPos.y);
